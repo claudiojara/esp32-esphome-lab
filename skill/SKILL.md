@@ -430,12 +430,6 @@ sensor:
 
 Add optional `number:` (calibration from HA) and `button:` (factory reset, restart) platforms — the component supports them.
 
-### GPIO3/GPIO4 short gotcha — ESP32-C3 SuperMini
-
-On the C3 SuperMini, **GPIO3 and GPIO4 pads are physically adjacent on the same edge**. Soldering both at once with generous solder easily creates a short between them — the #1 reason a mmWave sensor "doesn't work" on this board.
-
-**Prevention**: tin each wire separately, use fine solder, apply flux, make conical joints. After soldering, **verify with a multimeter in continuity mode — GPIO3 ↔ GPIO4 must NOT beep**. If it does, clean with solder wick and redo.
-
 ### UART debug: raw byte dump (diagnostic tool)
 
 When the `ld2410` parser warns `Max command length exceeded; ignoring` nonstop, drop the component entirely and dump raw bytes to identify the actual problem:
