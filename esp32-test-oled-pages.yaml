@@ -271,9 +271,13 @@ display:
         lambda: |-
           it.image(0, 0, id(img_avatar));
           if (id(mmwave_presence).state) {
-            it.printf(96, 8, id(font_small), TextAlign::TOP_CENTER, "TE VEO");
-            it.printf(96, 28, id(font_small), TextAlign::TOP_CENTER, "HOLA");
-            it.printf(96, 48, id(font_small), TextAlign::TOP_CENTER, "CLAU");
+            bool moving = id(mmwave_moving_target).state;
+            float dist = moving
+              ? (id(mmwave_moving_distance).has_state() ? id(mmwave_moving_distance).state : 0)
+              : (id(mmwave_still_distance).has_state() ? id(mmwave_still_distance).state : 0);
+            it.printf(96, 8, id(font_small), TextAlign::TOP_CENTER, moving ? "TE VEO" : "AHI ESTAS");
+            it.printf(96, 28, id(font_small), TextAlign::TOP_CENTER, "%.0fcm", dist);
+            it.printf(96, 48, id(font_small), TextAlign::TOP_CENTER, moving ? "MOVIL" : "QUIETO");
           } else {
             it.printf(96, 8, id(font_small), TextAlign::TOP_CENTER, "HOLA");
             it.printf(96, 28, id(font_small), TextAlign::TOP_CENTER, "SOY");
