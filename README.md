@@ -1,115 +1,158 @@
+<div align="center">
+
 # esp32-esphome-lab
 
-Experiments with **ESP32-C3 SuperMini + ESPHome + Home Assistant**. YAML-declarative
-firmware (no C++), OTA updates, native HA API with encryption, mDNS auto-discovery.
+**ESP32-C3 SuperMini + ESPHome + Home Assistant** — OLED dashboards, mmWave presence, YAML-declarative firmware.
 
-What lives here:
+[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![ESPHome](https://img.shields.io/badge/ESPHome-2026.4+-black?logo=esphome&logoColor=white)](https://esphome.io)
+[![Home Assistant](https://img.shields.io/badge/Home_Assistant-compatible-18BCF2?logo=home-assistant&logoColor=white)](https://www.home-assistant.io)
+[![Platform: ESP32-C3](https://img.shields.io/badge/Platform-ESP32--C3-E7352C?logo=espressif&logoColor=white)](https://www.espressif.com/en/products/socs/esp32-c3)
+[![Language: YAML](https://img.shields.io/badge/Config-YAML-CB171E?logo=yaml&logoColor=white)](https://yaml.org)
 
-- LED control from HA (the hello-world of embedded + HA)
-- OLED 1.3" SH1106 displays showing HA entities (covers, weather, system info)
-- Multi-page rotating dashboard with physical + virtual buttons
-- HLK-LD2410C mmWave presence sensor with distance/energy and reactive UI
+</div>
 
-## Hardware
+---
 
-| Part | Notes |
-|------|-------|
-| ESP32-C3 SuperMini | `board: esp32-c3-devkitm-1`, `variant: esp32c3`. LED on GPIO8 active-low. |
-| OLED 1.3" I2C (SH1106) | GPIO5 SDA / GPIO6 SCL. Requires `contrast: 100%` — default is black screen. |
-| HLK-LD2410C mmWave | UART at 256000 baud, GPIO4 TX (to sensor RX), GPIO3 RX (from sensor TX). VCC to 5V. |
-| Tactile button | GPIO7 to GND, internal pullup. |
+## Stack Tecnológico
 
-Home Assistant runs as a VM on Proxmox in this setup — the ESPHome HA addon has
-no USB access from the HAOS guest, so first flash is always from the Mac via
-`esphome` CLI. After that, OTA works from anywhere on the LAN.
+<table>
+  <tr>
+    <td align="center" width="180">
+      <img src="https://esphome.io/_images/logo-text.svg" width="56" height="56" alt="ESPHome" /><br>
+      <b>ESPHome</b><br>
+      <sub>Firmware declarativo</sub>
+    </td>
+    <td align="center" width="180">
+      <img src="https://cdn.simpleicons.org/homeassistant/18BCF2" width="56" height="56" alt="Home Assistant" /><br>
+      <b>Home Assistant</b><br>
+      <sub>API nativa + mDNS</sub>
+    </td>
+    <td align="center" width="180">
+      <img src="https://cdn.simpleicons.org/espressif/E7352C" width="56" height="56" alt="Espressif" /><br>
+      <b>ESP32-C3</b><br>
+      <sub>SuperMini RISC-V</sub>
+    </td>
+    <td align="center" width="180">
+      <img src="https://cdn.simpleicons.org/python/3776AB" width="56" height="56" alt="Python" /><br>
+      <b>Python + uv</b><br>
+      <sub>ESPHome CLI toolchain</sub>
+    </td>
+  </tr>
+  <tr>
+    <td align="center" width="180">
+      <img src="https://api.iconify.design/mdi:monitor-screenshot.svg?color=%23ffffff" width="56" height="56" alt="OLED" /><br>
+      <b>OLED SH1106</b><br>
+      <sub>1.3" 128×64 I²C</sub>
+    </td>
+    <td align="center" width="180">
+      <img src="https://api.iconify.design/mdi:motion-sensor.svg?color=%23ffffff" width="56" height="56" alt="mmWave" /><br>
+      <b>HLK-LD2410C</b><br>
+      <sub>24GHz mmWave UART</sub>
+    </td>
+    <td align="center" width="180">
+      <img src="https://api.iconify.design/mdi:home-automation.svg?color=%23ffffff" width="56" height="56" alt="HAOS" /><br>
+      <b>HAOS on Proxmox</b><br>
+      <sub>VM sin acceso a USB</sub>
+    </td>
+    <td align="center" width="180">
+      <img src="https://cdn.simpleicons.org/github/181717" width="56" height="56" alt="GitHub" /><br>
+      <b>GitHub</b><br>
+      <sub>Versioning + issues</sub>
+    </td>
+  </tr>
+</table>
 
-## Quick start
+---
 
-Prerequisites: Python 3.10+, `uv` installed.
+## Features
+
+- **LED control desde HA** como `light` entity
+- **OLED dashboards**: cortina (`cover.curtain`), clima con ícono dinámico, info de sistema, avatar embebido
+- **Multi-page rotation**: 5 páginas con auto-rotate (switch en HA) + botón físico (GPIO7) + botón virtual (HA)
+- **mmWave presence detection**: LD2410C por UART a 256000 baud, con distancia móvil / quieta / de detección + energía
+- **Reactive UI**: overlay de presencia en todas las páginas, avatar cambia de saludo cuando detecta a alguien
+- **HA online images**: iconos de clima servidos desde `/config/www/weather/<state>.png`
+- **OTA nativo** post-primer-flash — ya no se vuelve a tocar el USB
+
+---
+
+## Quick Start
+
+Prerequisites: Python 3.10+, [`uv`](https://github.com/astral-sh/uv).
 
 ```bash
-# 1. Clone
+# 1. Clonar
 git clone https://github.com/claudiojara/esp32-esphome-lab.git
 cd esp32-esphome-lab
 
-# 2. Install ESPHome CLI (isolated, fast)
+# 2. Instalar ESPHome
 uv tool install esphome
 
-# 3. Copy secrets template and fill with your WiFi / OTA credentials
+# 3. Copiar template de secretos y completar con tus credenciales
 cp secrets.yaml.example secrets.yaml
 $EDITOR secrets.yaml
 
-# 4. Pick a YAML and flash via USB (first time)
-ls /dev/cu.usbmodem*                        # find your port
+# 4. Generar una API encryption key nueva por device
+python3 -c "import secrets, base64; print(base64.b64encode(secrets.token_bytes(32)).decode())"
+# Pegala en el api.encryption.key del YAML que vayas a flashear
+
+# 5. Primer flash por USB
+ls /dev/cu.usbmodem*
 esphome run esp32-test.yaml --device /dev/cu.usbmodem<TAB>
 
-# 5. Adopt in HA: Settings -> Devices & Services -> ESPHome -> paste api.encryption.key
+# 6. Adoptar en HA: Settings -> Devices & Services -> ESPHome -> pegar la encryption key
 
-# 6. Subsequent flashes are OTA automatically
+# 7. A partir de ahora, OTA automático sin cable
 esphome run esp32-test.yaml
 ```
 
-Regenerate your own API encryption key per device (do NOT reuse the ones in
-this repo's YAMLs — they are examples):
+---
 
-```bash
-python3 -c "import secrets, base64; print(base64.b64encode(secrets.token_bytes(32)).decode())"
-```
+## Project Files
 
-## Project files
+| File | Qué hace |
+|------|----------|
+| `esp32-test.yaml` | LED built-in controlado por HA vía GPIO8 active-low. Starting point minimal. |
+| `esp32-test-interval.yaml` | Parpadeo standalone de 1s, sin `api`. Test de hardware aislado. |
+| `esp32-test-oled-cover.yaml` | OLED single-page mostrando `cover.curtain` position. |
+| `esp32-test-oled-weather.yaml` | OLED con reloj + ícono de clima dinámico fetchado de HA. |
+| `esp32-test-oled-pages.yaml` | **Proyecto principal.** Dashboard de 5 páginas (cortina, clima, sistema, avatar, presencia) con LD2410C integrado y UI reactiva. |
+| `mmwavetest.yaml` | LD2410C standalone sin display. |
+| `mmwavetest-debug.yaml` | Dump raw de bytes UART para diagnosticar cableado/baud. |
 
-| File | What it does |
-|------|--------------|
-| `esp32-test.yaml` | HA-controlled LED via GPIO8 active-low. Minimal starting point. |
-| `esp32-test-interval.yaml` | Standalone 1s LED blink, no HA api. For isolated hardware test. |
-| `esp32-test-oled-cover.yaml` | Single-page OLED showing `cover.curtain` position from HA. |
-| `esp32-test-oled-weather.yaml` | OLED with clock + dynamic weather icon fetched from `/config/www/weather/<state>.png`. |
-| `esp32-test-oled-pages.yaml` | **Main project.** Multi-page dashboard: curtain, weather, system, avatar, mmwave presence. Auto-rotation + physical/virtual buttons + LD2410C presence overlay on every page + reactive avatar. |
-| `mmwavetest.yaml` | Standalone LD2410C presence sensor device, no display. |
-| `mmwavetest-debug.yaml` | Raw UART byte dump variant for diagnosing bad wiring (cold joints, shorts, baud mismatch). See hex patterns in the skill. |
+---
 
-## Gotchas worth knowing
+## Notas de hardware
 
-These cost hours during the build — documented so the next person skips them.
+### C3 SuperMini LED es active-low
 
-### C3 SuperMini LED is active-low
+`output.gpio.inverted: true` en GPIO8 o HA muestra el estado al revés.
 
-`output.gpio.inverted: true` on GPIO8 or HA shows the state backwards. First
-thing to set up on this board.
+### SH1106 1.3" clones necesitan `contrast: 100%` explícito
 
-### SH1106 1.3" clones need explicit contrast
+El default del driver ESPHome es 0 → pantalla completamente negra aunque I²C scan encuentre el device.
 
-The default contrast in ESPHome's SH1106 driver is 0 on AliExpress clones — I2C
-scan finds the device, init succeeds, but the screen stays completely black.
-Always `contrast: 100%` in the `display:` block.
+### 1.3" OLED es SH1106, NO SSD1306
 
-### 1.3" OLED is SH1106, NOT SSD1306
+Dos controladores distintos. Regla: **0.96" = SSD1306**, **1.3" = SH1106**. Driver equivocado = píxeles basura.
 
-Two different controllers, different init sequences. `0.96" = SSD1306`,
-`1.3" = SH1106`. Wrong driver = garbage pixels.
+### LD2410C quiere 5V en VCC
 
-### GPIO3 and GPIO4 pads are physically adjacent on the SuperMini
+Datasheet 5-12V. Con 3.3V puede bootear pero stream gibberish.
 
-When soldering UART wires for the LD2410, extra solder bridges them easily. If
-your mmwave sensor shows raw byte patterns like `C0:E0:F0:FC:FE:FF` (progressive
-ones — an RC ramp), suspect a short. Multimeter in continuity mode between
-GPIO3 and GPIO4: must NOT beep.
+### First compile es lento
 
-### LD2410C VCC wants 5V
+3-5 minutos la primera vez, <30s las siguientes (cache en `.esphome/`).
 
-Datasheet says 5-12V. 3.3V is unreliable — sensor may boot but stream gibberish.
-
-### First compile is slow
-
-3-5 minutes the first time, under 30s after (cached in `.esphome/`). Be patient.
+---
 
 ## Agent skill
 
-The [`skill/`](skill/) folder mirrors the `esp32-homeassistant` Claude agent skill.
-It captures the full discovery/scaffolding/flashing workflow, display integration
-patterns, mmWave debugging techniques, and byte pattern fingerprints for
-diagnosing bad wiring. See [`skill/SKILL.md`](skill/SKILL.md).
+La carpeta [`skill/`](skill/) contiene el espejo del agent skill global `esp32-homeassistant`. Cubre discovery → scaffolding → flashing, display integration patterns, mmWave debugging con firmas de bytes UART, y la tabla canónica de boards → LEDs → GPIOs. Ver [`skill/SKILL.md`](skill/SKILL.md).
+
+---
 
 ## License
 
-MIT. Fork it, break it, learn from it.
+[MIT](LICENSE). Fork, break, learn.
