@@ -1,0 +1,45 @@
+esphome:
+  name: mmwavetest
+  friendly_name: mmWave Test
+
+esp32:
+  board: esp32-c3-devkitm-1
+  variant: esp32c3
+  framework:
+    type: arduino
+
+logger:
+  level: VERBOSE
+
+api:
+  encryption:
+    key: "hR7nQc4mJvK8xL2pF9sB6dN3tY1wE5aZ0oU7iM4lP8g="
+
+ota:
+  - platform: esphome
+    password: "c14uv3ot4.,1016"
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  ap:
+    ssid: "Mmwavetest Fallback"
+    password: "Esp32Fallback32321"
+
+captive_portal:
+
+# Sin ld2410: queremos ver bytes crudos, sin parser.
+uart:
+  id: ld2410_uart
+  tx_pin: GPIO4
+  rx_pin: GPIO3
+  baud_rate: 256000
+  parity: NONE
+  stop_bits: 1
+  debug:
+    direction: RX
+    dummy_receiver: true
+    after:
+      bytes: 32
+    sequence:
+      - lambda: UARTDebug::log_hex(direction, bytes, ':');
