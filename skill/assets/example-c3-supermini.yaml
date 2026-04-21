@@ -1,0 +1,45 @@
+# ESP32-C3 SuperMini — canonical starting point
+# Built-in LED on GPIO8, active-low (inverted).
+# Remember: C3 SuperMini usually has no BOOT button — jumper GPIO9 to GND for first flash.
+
+esphome:
+  name: c3-supermini
+  friendly_name: C3 SuperMini
+
+esp32:
+  board: esp32-c3-devkitm-1
+  variant: esp32c3
+  framework:
+    type: arduino
+
+logger:
+
+api:
+  encryption:
+    key: "REPLACE_WITH_FRESH_KEY_base64_32bytes"
+
+ota:
+  - platform: esphome
+    password: !secret ota_password
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  ap:
+    ssid: "C3-Supermini Fallback"
+    password: !secret fallback_password
+
+captive_portal:
+
+output:
+  - platform: gpio
+    pin:
+      number: GPIO8
+      inverted: true
+    id: led_builtin
+
+light:
+  - platform: binary
+    name: "LED Built-in"
+    output: led_builtin
+    id: led
