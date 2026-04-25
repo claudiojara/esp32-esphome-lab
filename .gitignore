@@ -1,2 +1,4 @@
 secrets.yaml
+secrets.h
 .esphome/
+.pio/
