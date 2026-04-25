@@ -1,0 +1,79 @@
+substitutions:
+  device_name: matrix8x8
+  friendly_name: Matrix 8x8
+
+esphome:
+  name: ${device_name}
+  friendly_name: ${friendly_name}
+
+esp32:
+  board: esp32-c3-devkitm-1
+  variant: esp32c3
+  framework:
+    type: arduino
+
+logger:
+
+api:
+  encryption:
+    key: "BRPr355g4GzCdYjCe4LXvEVKD4WnggTlbJtPKco38ZA="
+
+ota:
+  - platform: esphome
+    password: !secret ota_password
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  ap:
+    ssid: "Matrix8x8 Fallback"
+    password: !secret fallback_password
+
+captive_portal:
+
+# SPI bus para hablarle al MAX7219 (no necesita miso, el chip es write-only)
+spi:
+  clk_pin: GPIO6
+  mosi_pin: GPIO5
+
+# Switch en HA para prender/apagar el display
+switch:
+  - platform: template
+    name: None
+    id: display_on
+    icon: "mdi:led-on"
+    optimistic: true
+    restore_mode: RESTORE_DEFAULT_ON
+
+# Texto que viene desde HA (input_text.matrix_message)
+text_sensor:
+  - platform: homeassistant
+    id: ha_message
+    entity_id: input_text.matrix_message
+
+# Font pixel-perfect para matriz 8x8
+font:
+  - file: "gfonts://Press Start 2P"
+    id: pixel_font
+    size: 8
+
+# Display MAX7219 8x8
+display:
+  - platform: max7219digit
+    id: matrix
+    cs_pin: GPIO4
+    num_chips: 1
+    intensity: 5
+    scroll_mode: continuous
+    scroll_speed: 250ms
+    update_interval: 16ms
+    lambda: |-
+      // Si el switch está OFF, no dibujamos nada — el buffer auto-clearea.
+      if (!id(display_on).state) return;
+
+      // Si HA mandó un mensaje, mostralo. Si no, fallback a "HOLA".
+      if (id(ha_message).has_state()) {
+        it.print(0, 0, id(pixel_font), id(ha_message).state.c_str());
+      } else {
+        it.print(0, 0, id(pixel_font), "HOLA CLAUDIO !");
+      }
