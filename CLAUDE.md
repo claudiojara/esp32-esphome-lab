@@ -11,15 +11,26 @@ Proyecto de prueba ESP32-C3 SuperMini integrado a Home Assistant vía ESPHome. Y
 - **Board**: ESP32-C3 SuperMini (`esp32-c3-devkitm-1`, variant `esp32c3`)
 - **LED built-in**: GPIO8 **active-low** → `inverted: true` es obligatorio, sin eso HA muestra el estado invertido. Es el gotcha #1 de este board.
 
-## YAMLs
+## Estructura de proyectos
 
-- `esp32-test.yaml` — build principal: LED como entidad `light` controlable desde HA.
-- `esp32-test-interval.yaml` — variante sin `api`, parpadea el LED cada 1s. Test standalone para verificar flasheo/hardware.
-- `esp32-test-oled-cover.yaml` — LED + OLED 1.3" SH1106 (128×64) I²C en GPIO5 (SDA) / GPIO6 (SCL). Muestra hora + porcentaje de `cover.curtain` desde HA. Usa `gfonts://Roboto` (ESPHome baja las fuentes solo). Requiere autorizar el device en HA → Configure → tildar `cover.curtain`.
-- `esp32-test-oled-pages.yaml` — Dashboard multi-página: cortina, clima (reloj+ícono+temp), sistema, avatar. Rotación cada 5s por `switch.auto_rotate_pages` + `button.next_page` (virtual HA) + **botón físico en GPIO7** (a GND, pullup interno). Fetchea íconos del clima de `http://<HA-IP>:8123/local/weather/<state>.png`. **IMPORTANTE**: con `model: "SH1106 128x64"` es obligatorio `contrast: 100%`.
-- `esp32-test-oled-weather.yaml` — Reloj + tiempo con ícono dinámico. Usa `online_image` que fetchea `http://<HA-IP>:8123/local/weather/<state>.png` según cambia `weather.home`. Requiere subir PNGs a `/config/www/weather/` en HA: sunny/cloudy/rainy/etc + unknown.png fallback. `substitutions.ha_base_url` es el IP de HA — editar si cambia.
+Cada YAML vive en su propia subcarpeta dentro de [`projects/`](projects/), con su README y un symlink a `../../secrets.yaml` para que ESPHome lo encuentre desde adentro:
 
-Todos comparten `wifi`, `ota`, `api` (encriptada) y `captive_portal`.
+```
+projects/
+├── README.md                    ← índice de proyectos
+├── esp32-test/                  ← LED builtin como light HA (hello world)
+├── esp32-test-interval/         ← parpadeo standalone, sin api (smoke test hw)
+├── esp32-test-oled-cover/       ← OLED + cover.curtain%
+├── esp32-test-oled-pages/       ← dashboard multi-página + mmwave + botón físico
+├── esp32-test-oled-weather/     ← reloj + clima dinámico desde HA
+├── esp32-led-ring/              ← anillo WS2812B 16 LEDs → light.anillo + 11 efectos
+├── mmwavetest/                  ← LD2410C standalone (UART 256000 baud)
+└── mmwavetest-debug/            ← dump UART raw para diagnosticar cableado
+```
+
+Detalles, cableado y gotchas por proyecto en cada README.
+
+Todos comparten `wifi`, `ota`, `api` (encriptada) y `captive_portal`. **Cada uno es una firmware INDEPENDIENTE** — distintos `device_name`, distintos entity_ids — no coexisten en un mismo ESP físico.
 
 ## Secretos
 
@@ -27,9 +38,11 @@ Todos comparten `wifi`, `ota`, `api` (encriptada) y `captive_portal`.
 
 ## Comandos
 
-ESPHome instalado vía `uv tool install esphome` (no pip/pipx).
+ESPHome instalado vía `uv tool install esphome` (no pip/pipx). **Siempre ejecutar desde dentro de la carpeta del proyecto** — el symlink a `secrets.yaml` está pensado para eso.
 
 ```bash
+cd projects/esp32-test          # o el proyecto que quieras
+
 # Validar config
 esphome config esp32-test.yaml
 
@@ -46,11 +59,61 @@ esphome run esp32-test.yaml
 esphome logs esp32-test.yaml
 ```
 
-`.esphome/` es cache de build — gitignoreado.
+Cada subcarpeta de `projects/` genera su propio `.esphome/` con su build cache — gitignoreado.
 
 ## Integración con HA
 
 Después del primer flasheo y que el ESP se conecte al WiFi, HA lo autodescubre vía mDNS. Agregar integración **ESPHome** desde Settings → Devices & Services, pegar la `api.encryption.key` del YAML.
+
+**Versión de HA en uso** (a 2026-04-24):
+
+| Componente | Versión |
+|-----------|---------|
+| Método de instalación | Home Assistant OS |
+| Core | 2026.4.3 |
+| Supervisor | 2026.04.0 |
+| Operating System | 17.2 |
+| Frontend | 20260325.7 |
+
+HAOS corre como VM en Proxmox. Como estamos muy por encima de 2024.8, **siempre usar `action:`** en automations / scripts / Dev Tools — `service:` está deprecated y aunque sigue funcionando por backward compat, la UI y la docs ya no lo mencionan.
+
+## Gotchas y aprendizajes (importante leer antes de tocar)
+
+### HA: `action:` vs `service:` (cambio en 2024.8)
+
+Desde **Home Assistant 2024.8 (agosto 2024)** el campo `service:` en automations / scripts / Developer Tools fue renombrado a `action:`. **Ambos siguen funcionando** (backward compatible) pero `action:` es el nuevo estándar y la docs/UI lo usan exclusivamente.
+
+```yaml
+# Forma vieja (deprecated pero funciona)
+service: light.turn_on
+target: ...
+
+# Forma nueva (recomendada)
+action: light.turn_on
+target: ...
+```
+
+Cuando ayudes al user con service calls, **siempre usar `action:`**.
+
+### ESPHome 2026.4.x: `rmt_channel` removido del LED strip
+
+En `esp32_rmt_led_strip` la opción `rmt_channel:` ya no existe — el driver asigna canal RMT automáticamente. YAMLs viejos que la incluyan rompen la validación con `[rmt_channel] is an invalid option`. Solución: borrar la línea.
+
+### ESPHome: entity_id duplicado feo
+
+ESPHome arma entity_ids como `<platform>.<device_name>_<entity_name>`. Si el `esphome.name` y el `name:` del entity son similares, queda repetido y horrible. Ejemplo real: device `esp32-led-ring` + light `LED Ring` → `light.esp32_led_ring_led_ring`.
+
+**Solución**: usar `name: None` en el entity, así HA usa solo el `friendly_name` del device. Ejemplo en `esp32-led-ring.yaml`: device `anillo` + light `name: None` → `light.anillo`.
+
+**Antes de pasarle al user un entity_id en automations o Dev Tools, VERIFICAR el real**: HA → Settings → Devices & Services → ESPHome device → entities. **No asumir el formato simple `light.<name>`**.
+
+### WS2812B / NeoPixel: power y data correctos
+
+- **NUNCA alimentar un anillo de >8 LEDs desde el USB del SuperMini**. 16 LEDs full white = ~960mA. Las trazas del C3 SuperMini se calientan y se queman. Usar fuente externa USB-C 5V/2A directo al anillo, USB del ESP a otra fuente, **GND COMÚN obligatorio**.
+- **Si "le mando rojo y queda blanco"**: casi siempre es anillo SK6812 RGBW interpretado como WS2812 RGB → bytes desalineados. Cambiar `chipset: WS2812` por `chipset: SK6812` + `is_rgbw: true`.
+- **Resistor 330Ω en data y cap 1000µF en VCC del anillo** son obligatorios en producción. En prototipo de mesa con cable corto suele zafar sin ellos pero el primer LED puede mostrar glitches.
+- **Level shifter 74AHCT125** ideal para data (3.3V → 5V). Sin él anda en cable corto pero no es spec.
+- **Diagnóstico clave**: si los logs ESPHome muestran ON/OFF llegando del HA, el data line está OK. El problema entonces es config (chipset, rgb_order) o usuario (no clickea CALL ACTION o no usa color picker).
 
 ## Skill relacionado
 

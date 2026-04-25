@@ -4,6 +4,8 @@
 
 **ESP32-C3 SuperMini + ESPHome + Home Assistant** — OLED dashboards, mmWave presence, YAML-declarative firmware.
 
+<img src="assets/demo.gif" alt="Avatar page reacting to mmWave presence with live distance" width="480" />
+
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![ESPHome](https://img.shields.io/badge/ESPHome-2026.4+-black?logo=esphome&logoColor=white)](https://esphome.io)
 [![Home Assistant](https://img.shields.io/badge/Home_Assistant-compatible-18BCF2?logo=home-assistant&logoColor=white)](https://www.home-assistant.io)
@@ -97,7 +99,8 @@ $EDITOR secrets.yaml
 python3 -c "import secrets, base64; print(base64.b64encode(secrets.token_bytes(32)).decode())"
 # Pegala en el api.encryption.key del YAML que vayas a flashear
 
-# 5. Primer flash por USB
+# 5. Primer flash por USB (cd a la carpeta del proyecto que querés flashear)
+cd projects/esp32-test
 ls /dev/cu.usbmodem*
 esphome run esp32-test.yaml --device /dev/cu.usbmodem<TAB>
 
@@ -107,19 +110,24 @@ esphome run esp32-test.yaml --device /dev/cu.usbmodem<TAB>
 esphome run esp32-test.yaml
 ```
 
+> Cada subcarpeta de `projects/` tiene un symlink a `secrets.yaml` del root, así ESPHome encuentra los credenciales sin duplicarlos.
+
 ---
 
-## Project Files
+## Projects
 
-| File | Qué hace |
-|------|----------|
-| `esp32-test.yaml` | LED built-in controlado por HA vía GPIO8 active-low. Starting point minimal. |
-| `esp32-test-interval.yaml` | Parpadeo standalone de 1s, sin `api`. Test de hardware aislado. |
-| `esp32-test-oled-cover.yaml` | OLED single-page mostrando `cover.curtain` position. |
-| `esp32-test-oled-weather.yaml` | OLED con reloj + ícono de clima dinámico fetchado de HA. |
-| `esp32-test-oled-pages.yaml` | **Proyecto principal.** Dashboard de 5 páginas (cortina, clima, sistema, avatar, presencia) con LD2410C integrado y UI reactiva. |
-| `mmwavetest.yaml` | LD2410C standalone sin display. |
-| `mmwavetest-debug.yaml` | Dump raw de bytes UART para diagnosticar cableado/baud. |
+Cada proyecto vive en su propia carpeta bajo [`projects/`](projects/) con su YAML, README y symlink a secrets. Detalle e índice completo en [`projects/README.md`](projects/README.md).
+
+| Proyecto | Qué hace |
+|----------|----------|
+| [`projects/esp32-test`](projects/esp32-test/) | LED built-in como `light` HA vía GPIO8 active-low. Starting point minimal. |
+| [`projects/esp32-test-interval`](projects/esp32-test-interval/) | Parpadeo standalone de 1s, sin `api`. Smoke test de hardware. |
+| [`projects/esp32-test-oled-cover`](projects/esp32-test-oled-cover/) | OLED single-page mostrando `cover.curtain` position. |
+| [`projects/esp32-test-oled-weather`](projects/esp32-test-oled-weather/) | OLED con reloj + ícono de clima dinámico fetchado de HA. |
+| [`projects/esp32-test-oled-pages`](projects/esp32-test-oled-pages/) | **Proyecto principal.** Dashboard de 5 páginas con LD2410C integrado y UI reactiva. |
+| [`projects/esp32-led-ring`](projects/esp32-led-ring/) | Anillo WS2812B 16 LEDs como `light.anillo` con 11 efectos para indicar eventos. |
+| [`projects/mmwavetest`](projects/mmwavetest/) | LD2410C standalone sin display. |
+| [`projects/mmwavetest-debug`](projects/mmwavetest-debug/) | Dump raw de bytes UART para diagnosticar cableado/baud. |
 
 ---
 
