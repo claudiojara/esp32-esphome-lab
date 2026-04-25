@@ -14,6 +14,9 @@ Cada subcarpeta es una firmware ESPHome independiente: 1 YAML + su `secrets.yaml
 | [`esp32-led-ring`](esp32-led-ring/) | Anillo WS2812B 16 LEDs como `light.anillo` con 11 efectos para indicar eventos. |
 | [`mmwavetest`](mmwavetest/) | Sensor mmWave HLK-LD2410C: presencia, distancia móvil/quieta, energía. |
 | [`mmwavetest-debug`](mmwavetest-debug/) | Variante UART raw del mmwave para diagnosticar problemas de cableado. |
+| [`matrix8x8`](matrix8x8/) | LED matrix 8×8 con MAX7219, controlable desde HA con scroll text. Phase 1 hacia un Snake/Tetris. |
+| [`hourglass`](hourglass/) | **PlatformIO + Arduino C++** (no ESPHome). Reloj de arena digital con 2× MAX7219 8×8, sand physics, MQTT a HA. Phase 1.5 = blink test. |
+| [`tetris`](tetris/) | Tetris jugable sobre 2× WS2812B 8×8 chainados (board 8×16, 128 LEDs). Engine C++ custom incluido como header. Controles + score desde HA. |
 
 ## Convención
 
