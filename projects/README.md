@@ -7,7 +7,7 @@ Cada subcarpeta es una firmware ESPHome independiente: 1 YAML + su `secrets.yaml
 | Proyecto | Para qué sirve |
 |----------|----------------|
 | [`esp32-test`](esp32-test/) | LED builtin como entidad `light` controlable desde HA. El "hello world" del ESP32+HA. |
-| [`esp32-test-interval`](esp32-test-interval/) | Parpadea el LED builtin cada 1s. Sin `api`. Smoke test de hardware sin necesidad de HA. |
+| [`esp32-test-interval`](esp32-test-interval/) | Hace parpadear el LED builtin cada 1s. Sin `api`. Smoke test de hardware sin necesidad de HA. |
 | [`esp32-test-oled-cover`](esp32-test-oled-cover/) | LED + OLED SH1106 mostrando hora y % de `cover.curtain` desde HA. |
 | [`esp32-test-oled-pages`](esp32-test-oled-pages/) | Dashboard multi-página (cortina, clima, sistema, avatar) con rotación y botón físico. |
 | [`esp32-test-oled-weather`](esp32-test-oled-weather/) | Reloj + clima con ícono dinámico fetcheado desde HA. |
@@ -39,4 +39,4 @@ esphome logs <yaml>              # logs en vivo vía API
 
 ## Empezar uno nuevo
 
-Copiar la carpeta más parecida, renombrar el YAML, regenerar `api.encryption.key` con `openssl rand -base64 32`, ajustar `device_name` / `friendly_name`, agregar entrada al index de arriba.
+Se puede copiar la carpeta más parecida, renombrar el YAML, regenerar `api.encryption.key` con `openssl rand -base64 32`, ajustar `device_name` / `friendly_name`, y agregar entrada al index de arriba.

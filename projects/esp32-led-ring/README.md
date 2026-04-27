@@ -1,11 +1,11 @@
 # esp32-led-ring
 
-Anillo de 16 LEDs WS2812B (NeoPixel) como entidad `light.anillo` RGB addressable en HA. Pensado como **indicador de eventos**: notificaciones, alarmas, estados — color + efecto desde HA.
+Anillo de 16 LEDs WS2812B (NeoPixel) como entidad `light.anillo` RGB direccionable en HA. Diseñado como **indicador de eventos**: notificaciones, alarmas, estados — color + efecto desde HA.
 
 ## Hardware
 
 - ESP32-C3 SuperMini.
-- Anillo WS2812B 16 LEDs (5V, 3 pins: VCC, GND, DIN).
+- Anillo WS2812B 16 LEDs (5V, 3 pines: VCC, GND, DIN).
 - Cargador externo USB-C 5V/2A.
 
 ## Cableado
@@ -32,7 +32,7 @@ Anillo de 16 LEDs WS2812B (NeoPixel) como entidad `light.anillo` RGB addressable
 
 **NO alimentar el anillo desde el USB del ESP32.** 16 LEDs full white = ~960mA — las trazas del SuperMini se calientan, brownout, y eventualmente se queman. Siempre fuente externa al anillo.
 
-Mirá `../../CLAUDE.md` sección "Gotchas" para el deep-dive.
+Consulta `../../CLAUDE.md` sección "Gotchas" para el análisis detallado.
 
 ## Efectos disponibles
 
@@ -59,7 +59,7 @@ esphome logs esp32-led-ring.yaml
 
 Entity ID: **`light.anillo`** (gracias a `name: None` en el YAML — sin esto quedaba `light.esp32_led_ring_led_ring`).
 
-Probar desde Developer Tools → Acciones (HA 2024.8+ usa `action:`, no `service:`):
+Prueba desde Developer Tools → Acciones (HA 2024.8+ usa `action:`, no `service:`):
 
 ```yaml
 action: light.turn_on

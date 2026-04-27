@@ -4,7 +4,7 @@ Variante **diagnóstica** del proyecto `mmwavetest`. En vez de parsear el protoc
 
 ## Cuándo usarlo
 
-Cuando `mmwavetest` no recibe datos del sensor — antes de asumir que el sensor está roto, flasheás esto y mirás los logs.
+Cuando `mmwavetest` no recibe datos del sensor — antes de asumir que el sensor está roto, descarga este firmware y verifica los logs.
 
 ## Hardware
 
@@ -41,14 +41,14 @@ F4:F3:F2:F1 ... 04:03:02:01
 
 | Bytes en el log | Diagnóstico |
 |-----------------|-------------|
-| `F4:F3:F2:F1` y datos en el medio | Sensor OK — el problema estaba en otro lado (probar `mmwavetest`) |
+| `F4:F3:F2:F1` y datos en el medio | Sensor OK — el problema estaba en otro lado (prueba `mmwavetest`) |
 | Vacío / nada | Sensor sin power, GND flojo, o cable de TX cortado |
-| `C0:E0:F0:FC:FE:FF` (rampas RC progresivas) | **Short entre líneas** del UART — cold joints en la PCB del módulo o del ESP. Reflowar las soldaduras |
-| Bytes random sin firma | Baud rate mal o ruido eléctrico — verificar 256000 baud |
+| `C0:E0:F0:FC:FE:FF` (rampas RC progresivas) | **Short entre líneas** del UART — cold joints en la PCB del módulo o del ESP. Refluye las soldaduras |
+| Bytes random sin firma | Baud rate mal o ruido eléctrico — verifica 256000 baud |
 | Solo `00`s o solo `FF`s | Línea pulled en una dirección — falta resistor pullup o pin flotante |
 
 ## Caso real (sesión 2026-04-21)
 
-Con el sensor del lab, este debug reveló bytes `C0:E0:F0:FC:FC:FE:FE:FF:FF:FF:DF` — **rampas RC** en vez de pulsos cuadrados. Foto macro reveló dos cold joints en GPIO3/GPIO4. Después de re-soldar, los datos empezaron a fluir correctos en `mmwavetest`.
+Con el sensor del lab, este debug reveló bytes `C0:E0:F0:FC:FC:FE:FE:FF:FF:FF:DF` — **rampas RC** en vez de pulsos cuadrados. Foto macro reveló dos cold joints en GPIO3/GPIO4. Después de refluir, los datos empezaron a fluir correctos en `mmwavetest`.
 
 Memoria larga del incidente en engram, topic `bugfix/mmwave-cold-joints`.

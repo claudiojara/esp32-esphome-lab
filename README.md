@@ -97,9 +97,9 @@ $EDITOR secrets.yaml
 
 # 4. Generar una API encryption key nueva por device
 python3 -c "import secrets, base64; print(base64.b64encode(secrets.token_bytes(32)).decode())"
-# Pegala en el api.encryption.key del YAML que vayas a flashear
+# Pégala en el api.encryption.key del YAML que vayas a flashear
 
-# 5. Primer flash por USB (cd a la carpeta del proyecto que querés flashear)
+# 5. Primer flash por USB (accede a la carpeta del proyecto que quieres flashear)
 cd projects/esp32-test
 ls /dev/cu.usbmodem*
 esphome run esp32-test.yaml --device /dev/cu.usbmodem<TAB>

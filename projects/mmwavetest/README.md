@@ -30,7 +30,7 @@ UART a **256000 baud** (no 115200 como otros sensores HLK — es la rate especí
 
 ## Calibración
 
-Desde HA podés ajustar:
+Desde HA se puede ajustar:
 - Sensibilidad por gate (gates = "anillos" de distancia, 0.75m cada uno).
 - Distancia máxima de detección.
 - Tiempo de inactividad antes de marcar "no presence".
@@ -46,7 +46,7 @@ esphome logs mmwavetest.yaml
 
 ## Si los datos no llegan
 
-Si `binary_sensor.presence` queda permanente en `unknown` y no hay datos, el problema casi siempre es **cableado o cold joints en GPIO3/GPIO4**. Flasheá `../mmwavetest-debug/mmwavetest-debug.yaml` que muestra UART raw y diagnostica al toque (bytes con rampa RC tipo `C0:E0:F0:FC` = short entre líneas, soldadura mala).
+Si `binary_sensor.presence` queda permanente en `unknown` y no hay datos, el problema casi siempre es **cableado o cold joints en GPIO3/GPIO4**. Carga `../mmwavetest-debug/mmwavetest-debug.yaml` que muestra UART raw y diagnostica al toque (bytes con rampa RC tipo `C0:E0:F0:FC` = short entre líneas, soldadura mala).
 
 Ver también `../../skill/` y `../../CLAUDE.md` por más debugging del sensor.
 

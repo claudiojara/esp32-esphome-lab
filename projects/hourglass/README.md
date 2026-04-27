@@ -2,7 +2,7 @@
 
 Reloj de arena digital con 2× LED matrix MAX7219 8×8 sobre ESP32-C3 SuperMini, programado en **PlatformIO + Arduino C++** (no ESPHome).
 
-**Sin acelerómetro** — el flip se controla via HA (MQTT) o botón físico, no por gravedad real. Si después conseguís un MPU6050 lo sumamos.
+**Sin acelerómetro** — el flip se controla vía HA (MQTT) o botón físico, no por gravedad real. Si después se consigue un MPU6050 se suma.
 
 ## Por qué PlatformIO y no ESPHome
 
@@ -14,14 +14,14 @@ Reloj de arena digital con 2× LED matrix MAX7219 8×8 sobre ESP32-C3 SuperMini,
 | Integración HA | Native API | MQTT (Mosquitto addon) |
 | OTA | Built-in | `ArduinoOTA` library |
 
-Para juegos / física / lógica compleja, PlatformIO es la herramienta adecuada. ESPHome lo seguís usando para sensores y displays simples (matrix8x8, anillo, OLEDs).
+Para juegos / física / lógica compleja, PlatformIO es la herramienta adecuada. ESPHome se sigue usando para sensores y displays simples (matrix8x8, anillo, OLEDs).
 
 ## Hardware
 
-| Componente | ¿Tenés? | Notas |
+| Componente | ¿Disponible? | Notas |
 |-----------|---------|-------|
 | ESP32-C3 SuperMini | ✅ | Board nuevo, distinto del matrix8x8 / led-ring |
-| 2× MAX7219 8×8 LED matrix | ✅ | Encadenados via DOUT→DIN |
+| 2× MAX7219 8×8 LED matrix | ✅ | Encadenados vía DOUT→DIN |
 | Estructura física a 45° | ❌ | Las matrices van rotadas en diamond, esquinas tocándose en el medio (cuello) |
 | MPU6050 acelerómetro | ❌ (futuro) | Para versión "real" reactiva a gravedad. Sin esto, el flip es manual desde HA o botón |
 | Botón físico (opcional) | ❌ | Para reset/restart sin abrir HA |
@@ -62,7 +62,7 @@ Confirmar que el toolchain PlatformIO funciona en el SuperMini.
 - Conectar a la red
 - Cliente MQTT al broker Mosquitto del HA
 - Publicar `state` topic, suscribir `cmd` topic
-- HA discovery via MQTT (entidades aparecen solas en HA)
+- HA discovery vía MQTT (entidades aparecen solas en HA)
 
 ### Phase 2.C — Sand physics básico
 - Game tick cada N ms
@@ -87,11 +87,11 @@ Confirmar que el toolchain PlatformIO funciona en el SuperMini.
 ### Phase 3 (opcional, requiere MPU6050) — Real-time gravity
 - Acelerómetro detecta giro
 - Gravity vector actualiza en tiempo real
-- Granos reaccionan: si das vuelta el dispositivo, suben al otro panel naturalmente
+- Granos reaccionan: si se da vuelta el dispositivo, suben al otro panel naturalmente
 
 ## Setup
 
-### 1. Instalar PlatformIO Core (si no lo tenés)
+### 1. Instalar PlatformIO Core (si no está instalado)
 
 ```bash
 # Vía pip (system Python)
@@ -131,11 +131,11 @@ pio run -t upload -t monitor --upload-port /dev/cu.usbmodem<TAB>
 
 Después del primer flasheo, en Phase 2.B en adelante OTA estará habilitado y no se vuelve a tocar el USB.
 
-## Setup en HA (cuando lleguemos a Phase 2.B)
+## Setup en HA (cuando se llegue a Phase 2.B)
 
 ### Mosquitto MQTT broker
 
-Si no lo tenés:
+Si no está instalado:
 1. HA → Settings → Add-ons → Add-on Store → buscar "Mosquitto broker".
 2. Install + Start.
 3. Configurar usuario MQTT en HA → Settings → People → Users → ⊕ Add user (con permiso "Can only log in from the local network" desactivado para que MQTT funcione).
@@ -180,7 +180,7 @@ pio pkg install --library "majicdesigns/MD_MAX72XX@^3.5.0"  # ejemplo install li
 
 | Síntoma | Causa probable |
 |---------|----------------|
-| `No serial port found` al flashear | ESP no en modo bootloader. Manten BOOT presionado mientras enchufás USB. En el SuperMini suele autodetectar. |
+| `No serial port found` al flashear | ESP no en modo bootloader. Mantener BOOT presionado mientras se enchufa USB. En el SuperMini suele autodetectar. |
 | `Serial.println` no aparece en monitor | Falta `ARDUINO_USB_CDC_ON_BOOT=1` en `build_flags` (ya está incluido en `platformio.ini`) |
 | LED no parpadea pero serial sí imprime | GPIO equivocado. SuperMini = GPIO8. Otros boards = otro pin. |
 | Build falla con "espressif32 platform not found" | `pio platform install espressif32` la primera vez |

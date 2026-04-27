@@ -70,7 +70,7 @@ GPIO15 (LED) y GPIO9 (BOOT) están internos al módulo, no expuestos en pads ext
 
 **Para el join Zigbee inicial es altamente recomendable conectar la antena u.FL.** El handshake Zigbee es multi-step (Beacon Request → Beacon → Association Request → Association Response → transferencia de Network Key → Device Announce) y cualquier paso que falle por RF débil aborta el join entero.
 
-Una vez asociado, las network keys quedan persistidas en NVS (`zb_storage`) y la red banca el device aún a LQI bajo (40-65). Pero si lo movés o lo metés en una caja, **sin antena externa puede no sostenerse**.
+Una vez asociado, las network keys quedan persistidas en NVS (`zb_storage`) y la red sostiene el device aún a LQI bajo (40-65). Pero si se mueve el dispositivo o se coloca en una caja, **sin antena externa puede no sostenerse**.
 
 ## Coordinador y red Zigbee
 
@@ -101,7 +101,7 @@ alias get_idf='. ~/esp/esp-idf/export.sh'
 - esp-zigbee-sdk se documenta y debugea siempre con `idf.py`
 - Los managed components (`espressif/esp-zboss-lib`, `espressif/esp-zigbee-lib`) se resuelven solos
 - PlatformIO suele atrasar versiones de ESP-IDF
-- Cuando algo rompe, podés copiar errores literales de issues de GitHub sin traducir
+- Cuando algo rompe, se pueden copiar errores literales de issues de GitHub sin traducir
 
 ### Versiones
 
@@ -136,7 +136,7 @@ idf.py -p /dev/cu.usbmodem<TAB> flash monitor
 
 ### Cuándo usar `erase-flash`
 
-Solo cuando querés borrar el join Zigbee (limpia la NVS `zb_storage`):
+Solo cuando se desea borrar el join Zigbee (limpia la NVS `zb_storage`):
 
 ```bash
 idf.py -p /dev/cu.usbmodem<TAB> erase-flash
@@ -242,7 +242,7 @@ esp_zb_basic_cluster_add_attr(basic_cluster,
 | Cluster Basic (0x0000) | manuf, model, ZCL version |
 | Cluster Identify (0x0003) | required para commissioning |
 | Cluster On/Off (0x0006) | el state del light |
-| Channel mask | `ESP_ZB_TRANSCEIVER_ALL_CHANNELS_MASK` (11-26) en dev. Optimizable a `1u << 11` cuando confirmás que joinea siempre. |
+| Channel mask | `ESP_ZB_TRANSCEIVER_ALL_CHANNELS_MASK` (11-26) en dev. Optimizable a `1u << 11` cuando se confirma que joinea siempre. |
 | ED aging timeout | 64 min |
 | Keep-alive | 3000 ms |
 | Install code policy | `false` (default trust center link key) |
@@ -277,13 +277,13 @@ esp_zb_basic_cluster_add_attr(basic_cluster,
 | `MODULE_NOT_FOUND` al reiniciar Z2M | Path del require incorrecto en converter | Para Z2M 2.x: `require('zigbee-herdsman-converters/lib/modernExtend')` |
 | Device sigue como "Not supported" tras restart Z2M | Cache vieja del device | **Re-interview** desde Z2M Web UI (NO re-pair) |
 | Re-interview falla | End Device no responde a tiempo | Plan B: **remove** device en Z2M + factory reset (`erase-flash`) + permit_join + re-pair |
-| Toggle desde HA no responde | Cluster handler no recibe el callback | Mirar logs del C6 cuando hacés click — debería aparecer `Attr write — ep 10, cluster 0x6, attr 0x0` |
+| Toggle desde HA no responde | Cluster handler no recibe el callback | Mirar logs del C6 cuando se hace click — debería aparecer `Attr write — ep 10, cluster 0x6, attr 0x0` |
 
 ## Aprendizajes clave
 
 1. **ESPHome ≠ Zigbee endpoint**. Es WiFi-only. Para Zigbee custom: ESP-IDF + esp-zigbee-sdk en C.
 2. **XIAO C6 antena externa para join inicial**. PCB antenna sola es marginal en hosts/closets metálicos.
-3. **`erase-flash` solo cuando querés borrar el join**. Reflasheo normal preserva NVS.
+3. **`erase-flash` solo cuando se desea borrar el join**. Reflasheo normal preserva NVS.
 4. **Re-interview ≠ re-pair**. Cambios solo en cluster Basic → re-interview alcanza.
 5. **External converters Z2M 2.x**: auto-load desde `/config/zigbee2mqtt/external_converters/`. CommonJS con `modernExtend`.
 6. **Match Z2M ↔ device** por `modelIdentifier` ZCL string exacto. Cualquier diferencia rompe.

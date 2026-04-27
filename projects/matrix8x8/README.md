@@ -36,11 +36,11 @@ El datasheet del MAX7219 dice 4-5.5V. Pero a 5V VCC, el threshold de logic high 
 
 Con **VCC = 3.3V**, el threshold baja a 0.7×3.3 = 2.31V → ESP32 a 3.3V cumple sobrado. Trade: brillo un toque más bajo. Para POC y matriz dentro de cuarto es perfecto.
 
-Si querés brillo full → fuente externa 5V + level shifter 74AHCT125 en DIN/CS/CLK.
+Si se desea brillo full → fuente externa 5V + level shifter 74AHCT125 en DIN/CS/CLK.
 
 ## Setup en HA (obligatorio antes de flashear)
 
-Necesitamos un **helper de tipo Text** en HA que el ESP suscriba para sacar el mensaje a mostrar:
+Se necesita un **helper de tipo Text** en HA que el ESP suscriba para sacar el mensaje a mostrar:
 
 1. HA → **Settings → Devices & Services → Helpers → ⊕ Create Helper**.
 2. Elegir **Text**.
@@ -48,8 +48,8 @@ Necesitamos un **helper de tipo Text** en HA que el ESP suscriba para sacar el m
 4. Min length: 0, Max length: 100.
 5. Confirmar — queda como `input_text.matrix_message`.
 
-Después podés cambiar el texto desde:
-- HA Dashboard (agregás un card de tipo `entity` apuntando al helper).
+Después se puede cambiar el texto desde:
+- HA Dashboard (se agrega un card de tipo `entity` apuntando al helper).
 - Developer Tools → States → editar el state de `input_text.matrix_message`.
 - Cualquier automation con `action: input_text.set_value`.
 
@@ -80,15 +80,15 @@ Entidades expuestas:
 
 ## Test inicial
 
-1. Switch en ON desde HA → tenés que ver scrolleando "HOLA HA" (fallback porque el helper aún está vacío).
-2. Settear `input_text.matrix_message` = "Hola Claudio" → tiene que cambiar el texto en la matriz.
+1. Switch en ON desde HA → se debe ver scrolleando "HOLA HA" (fallback porque el helper aún está vacío).
+2. Setear `input_text.matrix_message` = "Hola Claudio" → debe cambiar el texto en la matriz.
 3. Switch en OFF → matriz queda en negro.
 
 ## Diagnóstico
 
 | Síntoma | Causa probable |
 |---------|----------------|
-| Matriz sin prender ni un LED | VCC/GND mal, o SPI no inicializa — revisá pinout |
+| Matriz sin prender ni un LED | VCC/GND mal, o SPI no inicializa — revisar pinout |
 | LEDs random encendidos al boot, después no responden | DIN/CS/CLK invertidos entre sí |
 | Texto pero girado/espejado | `rotate_chip:` mal — agregar `rotate_chip_180` o equivalente |
 | Brillo muy bajo aunque `intensity: 5` | VCC en 3.3V — esperable. Subir a 5V con level shifter para más brillo |
@@ -109,6 +109,6 @@ Cuando Phase 1 funcione, dos caminos:
 - Librería [`MD_MAX72XX`](https://github.com/MajicDesigns/MD_MAX72XX) (gold standard para MAX7219).
 - Game loop en C++ real, mucho más limpio.
 - MQTT para HA: publica `score`, `running`, suscribe `cmd/start`, `cmd/restart`.
-- Requiere Mosquitto addon en HA (ya lo tenés).
+- Requiere Mosquitto addon en HA (ya disponible).
 
 Por ahora foco en Phase 1: **que se vea en HA**.

@@ -21,14 +21,14 @@ Tetris jugable sobre 2 paneles WS2812B 8x8 chainados verticalmente (board lógic
 |          | VCC           |                | VCC           | 5V             |
 |          |               | DOUT →         | DIN           |                |
 
-Resistor 330Ω en serie en data (entre GPIO3 y DIN del primer panel) y cap 1000µF en VCC del primer panel — recomendado pero zafable en mesa con cable corto.
+Resistor 330Ω en serie en data (entre GPIO3 y DIN del primer panel) y cap 1000µF en VCC del primer panel — recomendado pero prescindible en mesa con cable corto.
 
 ## Phase 1 — Calibración
 
 El YAML expone 4 modos vía el selector de efectos del `light.tetris`:
 
-1. **Walk** — recorre LEDs 0→127 a 300ms por paso. Mirá el panel físico, anotá el orden. Logs en consola muestran el índice activo.
-2. **Manual** — slider `number.manual_led_index` (0-127) en HA. Arrastrás y se prende ese LED. Útil para confirmar puntos clave (¿es el LED 0 arriba-izquierda? ¿el 64 es el primer LED del panel 2?).
+1. **Walk** — recorre LEDs 0→127 a 300ms por paso. Observa el panel físico, anota el orden. Logs en consola muestran el índice activo.
+2. **Manual** — slider `number.manual_led_index` (0-127) en HA. Arrastra para activar ese LED. Útil para confirmar puntos clave (¿es el LED 0 arriba-izquierda? ¿el 64 es el primer LED del panel 2?).
 3. **Stripe x8** — cada grupo de 8 LEDs en un color distinto. Revela visualmente el patrón serpentine.
 4. **Halves** — primeros 64 LEDs azul, siguientes 64 rojo. Confirma que el chain entre paneles está en orden.
 
