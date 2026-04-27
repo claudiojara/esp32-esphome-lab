@@ -2,6 +2,18 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Convención de idioma para archivos del proyecto
+
+Toda la documentación, README, comentarios en código, archivos de skill y cualquier otro contenido textual generado dentro de este repositorio debe escribirse en **español neutro**. No usar voseo (vos, tenés, hacelo, ponete, dale, etc.) ni regionalismos rioplatenses. Usar segunda persona del singular tú/usted o construcciones impersonales (se hace, se debe, conviene). Esta regla aplica a:
+
+- README.md (raíz, `projects/`, cada subproyecto, `skills/`)
+- Comentarios dentro de archivos `.c`, `.h`, `.yaml`, `.js`, `.py`
+- Archivos de skill (`SKILL.md`, `references/`, `assets/`)
+- Mensajes de commit (mantener convencional: `feat()`, `fix()`, etc.)
+- Cualquier otro archivo de documentación
+
+La conversación en chat con el usuario puede usar voseo según el output style configurado, pero los **artefactos persistentes en el repo** son siempre en español neutro.
+
 ## Qué es
 
 Proyecto de prueba ESP32-C3 SuperMini integrado a Home Assistant vía ESPHome. YAML declarativo — no C++. Firmware flasheado por USB desde la Mac (HA corre como VM en Proxmox, el addon de ESPHome no ve el USB).

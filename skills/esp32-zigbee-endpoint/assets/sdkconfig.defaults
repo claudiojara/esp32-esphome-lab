@@ -1,0 +1,29 @@
+# Validated for ESP32-C6 (change CONFIG_IDF_TARGET to esp32h2 for H2).
+CONFIG_IDF_TARGET="esp32c6"
+CONFIG_ESPTOOLPY_FLASHSIZE_4MB=y
+
+# Native USB Serial/JTAG console — REQUIRED for boards without UART bridge chip
+# (XIAO ESP32-C6, ESP32-C6 DevKitM-1, ESP32-H2 DevKitM-1).
+CONFIG_ESP_CONSOLE_USB_SERIAL_JTAG=y
+CONFIG_ESP_CONSOLE_USB_SERIAL_JTAG_ENABLED=y
+
+# Logging
+CONFIG_LOG_DEFAULT_LEVEL_INFO=y
+
+# Custom partition table (Zigbee zb_storage + zb_fct REQUIRED, see partitions.csv)
+CONFIG_PARTITION_TABLE_CUSTOM=y
+CONFIG_PARTITION_TABLE_CUSTOM_FILENAME="partitions.csv"
+CONFIG_PARTITION_TABLE_OFFSET=0x8000
+
+# Zigbee — End Device with native 802.15.4 radio.
+# Change CONFIG_ZB_ZED=y to CONFIG_ZB_ZCZR=y for a router (mains-powered repeater).
+CONFIG_ZB_ENABLED=y
+CONFIG_ZB_ZED=y
+CONFIG_ZB_RADIO_NATIVE=y
+
+# FreeRTOS tick rate that ZBoss expects
+CONFIG_FREERTOS_HZ=1000
+
+# Disable BLE / WiFi to save space (this is a pure Zigbee device).
+# Remove if you need coex (rare for endpoint devices).
+CONFIG_BT_ENABLED=n
