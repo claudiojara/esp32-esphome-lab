@@ -10,7 +10,7 @@ description: >
   idf_component.yml depending on espressif/esp-zigbee-lib.
 license: Apache-2.0
 metadata:
-  author: gentleman-programming
+  author: Claudio Jara
   version: "1.0"
 ---
 
@@ -55,39 +55,39 @@ Only when you want to wipe the Zigbee join (clears NVS `zb_storage`). Normal fir
 
 ## Discovery Phase (MANDATORY — run before scaffolding)
 
-| # | Question | Why it matters |
-|---|----------|----------------|
-| 1 | **Exact board?** (XIAO ESP32-C6, ESP32-C6 DevKitC-1, ESP32-H2 DevKitM-1, custom) | LED GPIO, button GPIO, USB type (native vs CP2102), antenna availability |
-| 2 | **Zigbee coordinator?** (SLZB-06, Sonoff Dongle-E, SkyConnect, ConBee II) | Stack name (zstack/ember/ezsp) — only relevant if user troubleshoots Z2M |
-| 3 | **Z2M version + Zigbee channel + Ext PAN ID** (Z2M Web UI → Settings → About) | Channel mask in firmware. Z2M 2.x converter format differs from 1.x |
-| 4 | **Sensors/actuators on the device?** | Drives endpoint count + cluster choice (0x0006 on/off, 0x0402 temp, 0x0405 humidity, 0x0500 IAS Zone) |
-| 5 | **External antenna available?** (XIAO C6 has u.FL connector) | Critical for first join. PCB antenna alone often fails the multi-step Zigbee handshake |
-| 6 | **Soldering iron available?** | If no, scope is limited to LED/button builtin on the board — set expectations early |
+| #   | Question                                                                         | Why it matters                                                                                        |
+| --- | -------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| 1   | **Exact board?** (XIAO ESP32-C6, ESP32-C6 DevKitC-1, ESP32-H2 DevKitM-1, custom) | LED GPIO, button GPIO, USB type (native vs CP2102), antenna availability                              |
+| 2   | **Zigbee coordinator?** (SLZB-06, Sonoff Dongle-E, SkyConnect, ConBee II)        | Stack name (zstack/ember/ezsp) — only relevant if user troubleshoots Z2M                              |
+| 3   | **Z2M version + Zigbee channel + Ext PAN ID** (Z2M Web UI → Settings → About)    | Channel mask in firmware. Z2M 2.x converter format differs from 1.x                                   |
+| 4   | **Sensors/actuators on the device?**                                             | Drives endpoint count + cluster choice (0x0006 on/off, 0x0402 temp, 0x0405 humidity, 0x0500 IAS Zone) |
+| 5   | **External antenna available?** (XIAO C6 has u.FL connector)                     | Critical for first join. PCB antenna alone often fails the multi-step Zigbee handshake                |
+| 6   | **Soldering iron available?**                                                    | If no, scope is limited to LED/button builtin on the board — set expectations early                   |
 
 ---
 
 ## Decision Tree
 
-| User wants... | Approach |
-|---------------|----------|
-| Connect ESP32 to HA without writing C | ESPHome WiFi — use `esp32-homeassistant` skill instead |
-| Custom Zigbee device joining Z2M | This skill — ESP-IDF + esp-zigbee-sdk + JS converter |
-| ESP32 as Zigbee coordinator (replace Sonoff stick) | Out of scope — flash Espressif RCP firmware + use serial adapter `ezsp` in Z2M |
-| Battery-powered Zigbee sensor with deep sleep | This skill — `ESP_ZB_DEVICE_TYPE_ED` + ESP-IDF sleep API |
-| Mains-powered Zigbee router/repeater | This skill — `ESP_ZB_DEVICE_TYPE_ROUTER` (less common, network coverage helper) |
-| Use ZHA instead of Z2M | Out of scope — ZHA requires Python quirks files, not JS converters |
+| User wants...                                      | Approach                                                                        |
+| -------------------------------------------------- | ------------------------------------------------------------------------------- |
+| Connect ESP32 to HA without writing C              | ESPHome WiFi — use `esp32-homeassistant` skill instead                          |
+| Custom Zigbee device joining Z2M                   | This skill — ESP-IDF + esp-zigbee-sdk + JS converter                            |
+| ESP32 as Zigbee coordinator (replace Sonoff stick) | Out of scope — flash Espressif RCP firmware + use serial adapter `ezsp` in Z2M  |
+| Battery-powered Zigbee sensor with deep sleep      | This skill — `ESP_ZB_DEVICE_TYPE_ED` + ESP-IDF sleep API                        |
+| Mains-powered Zigbee router/repeater               | This skill — `ESP_ZB_DEVICE_TYPE_ROUTER` (less common, network coverage helper) |
+| Use ZHA instead of Z2M                             | Out of scope — ZHA requires Python quirks files, not JS converters              |
 
 ---
 
 ## Workflow Phases (recommended progression)
 
-| Phase | What | Why |
-|-------|------|-----|
-| 0 | Blink test (no Zigbee) | Validate ESP-IDF toolchain, USB Serial/JTAG, LED GPIO before protocol complexity |
-| 1 | Zigbee on/off light, no manuf/model | Validate pairing, channel scan, NVS persistence — Z2M lists as "Not supported", that's OK |
-| 2 | Real sensor (DHT, BME, PIR) | Add second endpoint with sensor clusters (0x0402, 0x0405, 0x0500) |
-| 3 | Manuf/model + external converter | Z2M matches `modelIdentifier`, applies converter, clean entity names |
-| 4+ | Additional endpoints | Multi-cluster device — light + sensor + button on same device |
+| Phase | What                                | Why                                                                                       |
+| ----- | ----------------------------------- | ----------------------------------------------------------------------------------------- |
+| 0     | Blink test (no Zigbee)              | Validate ESP-IDF toolchain, USB Serial/JTAG, LED GPIO before protocol complexity          |
+| 1     | Zigbee on/off light, no manuf/model | Validate pairing, channel scan, NVS persistence — Z2M lists as "Not supported", that's OK |
+| 2     | Real sensor (DHT, BME, PIR)         | Add second endpoint with sensor clusters (0x0402, 0x0405, 0x0500)                         |
+| 3     | Manuf/model + external converter    | Z2M matches `modelIdentifier`, applies converter, clean entity names                      |
+| 4+    | Additional endpoints                | Multi-cluster device — light + sensor + button on same device                             |
 
 Detailed rationale per phase: [references/workflow.md](references/workflow.md)
 
@@ -120,15 +120,17 @@ Full skeleton with signal handler + attribute handler: [assets/main-skeleton.c](
 Place at `/config/zigbee2mqtt/external_converters/<file>.js` (auto-loads on Z2M restart). Validate by checking MQTT topic `zigbee2mqtt/bridge/converters` — empty array means converter failed to load.
 
 ```javascript
-const {onOff} = require('zigbee-herdsman-converters/lib/modernExtend');
+const { onOff } = require("zigbee-herdsman-converters/lib/modernExtend");
 
-module.exports = [{
-    zigbeeModel: ['xiao-c6-light'],   // MUST match firmware MODEL_IDENTIFIER exactly
-    model: 'xiao-c6-light',
-    vendor: 'ClaudioJaraLab',         // MUST match firmware MANUFACTURER_NAME exactly
-    description: 'Custom Zigbee light',
-    extend: [onOff({powerOnBehavior: false})],
-}];
+module.exports = [
+  {
+    zigbeeModel: ["xiao-c6-light"], // MUST match firmware MODEL_IDENTIFIER exactly
+    model: "xiao-c6-light",
+    vendor: "ClaudioJaraLab", // MUST match firmware MANUFACTURER_NAME exactly
+    description: "Custom Zigbee light",
+    extend: [onOff({ powerOnBehavior: false })],
+  },
+];
 ```
 
 After dropping the file: HA → Add-ons → Zigbee2MQTT → Restart → Z2M Web UI → device → **Re-interview** (NOT re-pair).

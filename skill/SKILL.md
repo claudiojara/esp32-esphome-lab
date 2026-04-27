@@ -8,7 +8,7 @@ description: >
   build an IoT device that talks to Home Assistant.
 license: Apache-2.0
 metadata:
-  author: gentleman-programming
+  author: Claudio Jara
   version: "1.2"
 ---
 
@@ -43,22 +43,22 @@ The ESPHome addon runs inside HAOS (often on Proxmox/remote host) and has NO acc
 
 Ask the user these questions and WAIT for answers. Do NOT proceed with scaffolding until you have at least the board and WiFi creds.
 
-| # | Question | Why it matters |
-|---|----------|----------------|
-| 1 | **Exact board model?** (ESP32 DevKit classic, ESP32-S3 DevKitC-1, ESP32-S3 SuperMini, ESP32-C3 DevKitM-1, ESP32-C3 SuperMini, other) | Determines `board:` + `variant:` + LED GPIO + LED type (binary vs RGB) + inversion |
-| 2 | **USB serial port name?** (`ls /dev/cu.*` on macOS, `ls /dev/ttyUSB* /dev/ttyACM*` on Linux) | Used for first flash. Port naming hints at chip type |
-| 3 | **Home Assistant setup?** (HAOS, Container, Supervised, Core — and where it runs: Proxmox, Pi, NUC) | Confirms that addon-based flashing won't work → reinforces local CLI approach |
-| 4 | **WiFi SSID and password?** | Required for `secrets.yaml`. If user prefers not to share, tell them to fill in themselves after scaffolding |
-| 5 | **What should the ESP32 DO?** (blink LED test, DHT22 temp/humidity, PIR motion, relay, button, display, multiple things) | Drives the YAML components beyond WiFi + API + LED |
+| #   | Question                                                                                                                             | Why it matters                                                                                               |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------ |
+| 1   | **Exact board model?** (ESP32 DevKit classic, ESP32-S3 DevKitC-1, ESP32-S3 SuperMini, ESP32-C3 DevKitM-1, ESP32-C3 SuperMini, other) | Determines `board:` + `variant:` + LED GPIO + LED type (binary vs RGB) + inversion                           |
+| 2   | **USB serial port name?** (`ls /dev/cu.*` on macOS, `ls /dev/ttyUSB* /dev/ttyACM*` on Linux)                                         | Used for first flash. Port naming hints at chip type                                                         |
+| 3   | **Home Assistant setup?** (HAOS, Container, Supervised, Core — and where it runs: Proxmox, Pi, NUC)                                  | Confirms that addon-based flashing won't work → reinforces local CLI approach                                |
+| 4   | **WiFi SSID and password?**                                                                                                          | Required for `secrets.yaml`. If user prefers not to share, tell them to fill in themselves after scaffolding |
+| 5   | **What should the ESP32 DO?** (blink LED test, DHT22 temp/humidity, PIR motion, relay, button, display, multiple things)             | Drives the YAML components beyond WiFi + API + LED                                                           |
 
 ### USB port name heuristics
 
-| Port name pattern | Likely chip | Board family |
-|-------------------|-------------|--------------|
-| `USB JTAG/serial debug unit` / `cu.usbmodem*` | Native USB-JTAG (built into SoC) | ESP32-S3 or ESP32-C3 |
-| `SLAB_USBtoUART` / `cu.SLAB_*` | Silicon Labs CP210x | Classic ESP32, S2, some S3 boards |
-| `wchusbserial*` / `cu.wchusbserial*` | WCH CH340/CH341 | Cheap classic ESP32, NodeMCU-style |
-| `cu.usbserial-*` | FTDI FT232 | Older dev kits |
+| Port name pattern                             | Likely chip                      | Board family                       |
+| --------------------------------------------- | -------------------------------- | ---------------------------------- |
+| `USB JTAG/serial debug unit` / `cu.usbmodem*` | Native USB-JTAG (built into SoC) | ESP32-S3 or ESP32-C3               |
+| `SLAB_USBtoUART` / `cu.SLAB_*`                | Silicon Labs CP210x              | Classic ESP32, S2, some S3 boards  |
+| `wchusbserial*` / `cu.wchusbserial*`          | WCH CH340/CH341                  | Cheap classic ESP32, NodeMCU-style |
+| `cu.usbserial-*`                              | FTDI FT232                       | Older dev kits                     |
 
 If user says "USB JTAG/serial debug unit" and is unsure of the board → strongly bias toward ESP32-S3 or C3. Ask them to read the chip label on the board.
 
@@ -68,14 +68,14 @@ If user says "USB JTAG/serial debug unit" and is unsure of the board → strongl
 
 This table is load-bearing. Get this wrong and the LED won't blink.
 
-| Board | `board:` value | `variant:` | LED GPIO | LED type | `inverted:` | Has BOOT button? |
-|-------|---------------|-----------|----------|----------|-------------|-------------------|
-| ESP32 DevKit (classic) | `esp32dev` | `esp32` | GPIO2 | binary | `false` | Yes |
-| ESP32-S3 DevKitC-1 | `esp32-s3-devkitc-1` | `esp32s3` | GPIO48 | RGB WS2812 | n/a | Yes |
-| ESP32-S3 SuperMini | `esp32-s3-devkitc-1` | `esp32s3` | GPIO48 | RGB WS2812 | n/a | Usually no |
-| ESP32-C3 DevKitM-1 | `esp32-c3-devkitm-1` | `esp32c3` | GPIO8 | binary | **`true`** | Yes |
-| ESP32-C3 SuperMini | `esp32-c3-devkitm-1` | `esp32c3` | GPIO8 | binary | **`true`** | Usually no |
-| ESP8266 NodeMCU | `nodemcuv2` | n/a (use `esp8266:` block) | GPIO2 | binary | **`true`** | Yes |
+| Board                  | `board:` value       | `variant:`                 | LED GPIO | LED type   | `inverted:` | Has BOOT button? |
+| ---------------------- | -------------------- | -------------------------- | -------- | ---------- | ----------- | ---------------- |
+| ESP32 DevKit (classic) | `esp32dev`           | `esp32`                    | GPIO2    | binary     | `false`     | Yes              |
+| ESP32-S3 DevKitC-1     | `esp32-s3-devkitc-1` | `esp32s3`                  | GPIO48   | RGB WS2812 | n/a         | Yes              |
+| ESP32-S3 SuperMini     | `esp32-s3-devkitc-1` | `esp32s3`                  | GPIO48   | RGB WS2812 | n/a         | Usually no       |
+| ESP32-C3 DevKitM-1     | `esp32-c3-devkitm-1` | `esp32c3`                  | GPIO8    | binary     | **`true`**  | Yes              |
+| ESP32-C3 SuperMini     | `esp32-c3-devkitm-1` | `esp32c3`                  | GPIO8    | binary     | **`true`**  | Usually no       |
+| ESP8266 NodeMCU        | `nodemcuv2`          | n/a (use `esp8266:` block) | GPIO2    | binary     | **`true`**  | Yes              |
 
 ### Why `inverted: true` for C3
 
@@ -203,8 +203,8 @@ Adds an `interval:` that toggles the LED every 1s from firmware. Confirms the de
 output:
   - platform: gpio
     pin:
-      number: GPIO8       # C3 SuperMini; adjust per board
-      inverted: true      # Required for C3
+      number: GPIO8 # C3 SuperMini; adjust per board
+      inverted: true # Required for C3
     id: led_builtin
 
 light:
@@ -233,20 +233,21 @@ Displays are the #2 request after LEDs. This section captures the hardware selec
 
 ### Display selection cheatsheet
 
-| Display | Tech | Res | Color | Bus | Price | Use for |
-|---------|------|-----|-------|-----|-------|---------|
-| SSD1306 0.96" | OLED | 128×64 | 1-bit | I²C | ~$3 | Text-only micro-status |
-| **SH1106 1.3"** | OLED | 128×64 | 1-bit | I²C | ~$3-5 | Text + simple icons (default) |
-| **ST7789 1.3"** | IPS LCD | 240×240 | 16-bit color | SPI | ~$5-8 | Dashboards, icons, photos |
-| GC9A01 1.28" round | IPS LCD | 240×240 | 16-bit color | SPI | ~$6-10 | Watch-like circular UIs |
-| ILI9341 2.4/2.8" | TFT | 320×240 | 16-bit | SPI | ~$8-15 | Wall panels, bigger dashboards |
-| E-paper (Waveshare 2.9") | E-ink | varies | 1 or 3 color | SPI | ~$20+ | Low-power always-on (slow refresh) |
+| Display                  | Tech    | Res     | Color        | Bus | Price  | Use for                            |
+| ------------------------ | ------- | ------- | ------------ | --- | ------ | ---------------------------------- |
+| SSD1306 0.96"            | OLED    | 128×64  | 1-bit        | I²C | ~$3    | Text-only micro-status             |
+| **SH1106 1.3"**          | OLED    | 128×64  | 1-bit        | I²C | ~$3-5  | Text + simple icons (default)      |
+| **ST7789 1.3"**          | IPS LCD | 240×240 | 16-bit color | SPI | ~$5-8  | Dashboards, icons, photos          |
+| GC9A01 1.28" round       | IPS LCD | 240×240 | 16-bit color | SPI | ~$6-10 | Watch-like circular UIs            |
+| ILI9341 2.4/2.8"         | TFT     | 320×240 | 16-bit       | SPI | ~$8-15 | Wall panels, bigger dashboards     |
+| E-paper (Waveshare 2.9") | E-ink   | varies  | 1 or 3 color | SPI | ~$20+  | Low-power always-on (slow refresh) |
 
 **Do NOT recommend e-paper** for anything with a moving clock or frequent updates — refresh takes 1–3s and has ghosting.
 
 ### 1.3" OLED is SH1106, NOT SSD1306
 
 The most common bite. Rule of thumb:
+
 - **0.96" OLED → SSD1306**
 - **1.3" OLED → SH1106** (different controller, different init sequence)
 
@@ -261,18 +262,18 @@ display:
   - platform: ssd1306_i2c
     model: "SH1106 128x64"
     address: 0x3C
-    contrast: 100%   # ← REQUIRED on SH1106 clones
+    contrast: 100% # ← REQUIRED on SH1106 clones
 ```
 
 Symptom → fix triage:
 
-| Symptom | Cause | Fix |
-|---------|-------|-----|
-| I²C scan finds 0x3C, but display is black | SH1106 default contrast is 0 | Add `contrast: 100%` |
-| Everything shows shifted 2px right with garbage edge | Wrong driver model (SSD1306 init on SH1106) | Set `model: "SH1106 128x64"` |
-| Display full of random pixels | Hardware works but init mismatched | Power cycle (unplug USB 5s) — OTA doesn't reset OLED chip |
-| Nothing found on I²C scan | Wiring / power / wrong pins | Check VDD=3.3V not 5V, SDA/SCL not swapped |
-| Pixels show but dim / faded | Low contrast | `contrast: 100%` |
+| Symptom                                              | Cause                                       | Fix                                                       |
+| ---------------------------------------------------- | ------------------------------------------- | --------------------------------------------------------- |
+| I²C scan finds 0x3C, but display is black            | SH1106 default contrast is 0                | Add `contrast: 100%`                                      |
+| Everything shows shifted 2px right with garbage edge | Wrong driver model (SSD1306 init on SH1106) | Set `model: "SH1106 128x64"`                              |
+| Display full of random pixels                        | Hardware works but init mismatched          | Power cycle (unplug USB 5s) — OTA doesn't reset OLED chip |
+| Nothing found on I²C scan                            | Wiring / power / wrong pins                 | Check VDD=3.3V not 5V, SDA/SCL not swapped                |
+| Pixels show but dim / faded                          | Low contrast                                | `contrast: 100%`                                          |
 
 **Always power cycle after flashing a display-adjacent firmware change.** OTA resets the MCU but not the peripherals — the OLED can hang in a weird state from the previous firmware's init.
 
@@ -280,11 +281,11 @@ Symptom → fix triage:
 
 Pick non-strapping, non-USB pins:
 
-| Board | Recommended SDA / SCL | Avoid (strapping / USB / serial) |
-|-------|-----------------------|-----------------------------------|
-| ESP32-C3 SuperMini | GPIO5 / GPIO6 | GPIO2, 8 (LED), 9, 18/19 (USB), 20/21 (UART) |
-| ESP32-S3 DevKitC-1 | GPIO8 / GPIO9 | GPIO0, 45, 46 (strapping), 19/20 (USB) |
-| ESP32 DevKit (classic) | GPIO21 / GPIO22 (defaults) | GPIO0, 2, 5, 12, 15 (strapping) |
+| Board                  | Recommended SDA / SCL      | Avoid (strapping / USB / serial)             |
+| ---------------------- | -------------------------- | -------------------------------------------- |
+| ESP32-C3 SuperMini     | GPIO5 / GPIO6              | GPIO2, 8 (LED), 9, 18/19 (USB), 20/21 (UART) |
+| ESP32-S3 DevKitC-1     | GPIO8 / GPIO9              | GPIO0, 45, 46 (strapping), 19/20 (USB)       |
+| ESP32 DevKit (classic) | GPIO21 / GPIO22 (defaults) | GPIO0, 2, 5, 12, 15 (strapping)              |
 
 I²C pins are **reassignable by software** on all ESP32 variants — the "default" pins are conventions, not hardware requirements. Pick any free pin.
 
@@ -348,7 +349,7 @@ font:
   - file: "gfonts://Roboto"
     id: font_small
     size: 12
-  - file: "gfonts://Roboto@700"   # 700 = bold weight
+  - file: "gfonts://Roboto@700" # 700 = bold weight
     id: font_big
     size: 32
 ```
@@ -365,7 +366,7 @@ image:
     id: img_avatar
     resize: 64x64
     type: BINARY
-    dither: FloydSteinberg   # for photos/gradients
+    dither: FloydSteinberg # for photos/gradients
 ```
 
 For 1-bit displays, `FloydSteinberg` is essential — simple thresholding destroys detail. Keep expectations low: a full-color photo → 1-bit is lossy. For monochrome displays, prefer simple silhouette icons to photos.
@@ -378,14 +379,14 @@ mmWave presence sensors (LD2410 family especially) are a big step up from PIR: d
 
 ### Module selection
 
-| Module | Tech | UART baud | Protocol | Price | Notes |
-|--------|------|-----------|----------|-------|-------|
-| **HLK-LD2410C** | 24GHz mmWave | 256000 | Binary | ~$5-8 | Default recommendation. Two zones (moving + still). |
-| HLK-LD2410B | 24GHz | 256000 | Binary | ~$5 | Older, same protocol as LD2410C |
-| HLK-LD2420 | 24GHz | 256000 | Different protocol | ~$4 | NOT compatible with `ld2410` component |
-| HLK-LD2450 | 24GHz | 256000 | Different | ~$8-10 | Tracks 2D position (X, Y). Use `ld2450` component |
-| HLK-LD1125H / LD1115H | 24GHz (old) | **9600** | ASCII text | ~$4 | Different component, ASCII output |
-| RCWL-0516 | Doppler | none | GPIO pulse | ~$1 | No UART, binary motion only. Use `binary_sensor: gpio` |
+| Module                | Tech         | UART baud | Protocol           | Price  | Notes                                                  |
+| --------------------- | ------------ | --------- | ------------------ | ------ | ------------------------------------------------------ |
+| **HLK-LD2410C**       | 24GHz mmWave | 256000    | Binary             | ~$5-8  | Default recommendation. Two zones (moving + still).    |
+| HLK-LD2410B           | 24GHz        | 256000    | Binary             | ~$5    | Older, same protocol as LD2410C                        |
+| HLK-LD2420            | 24GHz        | 256000    | Different protocol | ~$4    | NOT compatible with `ld2410` component                 |
+| HLK-LD2450            | 24GHz        | 256000    | Different          | ~$8-10 | Tracks 2D position (X, Y). Use `ld2450` component      |
+| HLK-LD1125H / LD1115H | 24GHz (old)  | **9600**  | ASCII text         | ~$4    | Different component, ASCII output                      |
+| RCWL-0516             | Doppler      | none      | GPIO pulse         | ~$1    | No UART, binary motion only. Use `binary_sensor: gpio` |
 
 **If you see `HLK-LD24XX`**: confirm it's 2410 specifically before configuring. Clones often mislabel. 2420/2450/2410 are NOT interchangeable.
 
@@ -404,8 +405,8 @@ Sensor has 5 pads: `TX RX OUT GND VCC`. ESPHome uses UART, so `OUT` pin (digital
 ```yaml
 uart:
   id: ld2410_uart
-  tx_pin: GPIO4       # ESP transmits here → sensor RX
-  rx_pin: GPIO3       # ESP receives here ← sensor TX
+  tx_pin: GPIO4 # ESP transmits here → sensor RX
+  rx_pin: GPIO3 # ESP receives here ← sensor TX
   baud_rate: 256000
   parity: NONE
   stop_bits: 1
@@ -415,17 +416,18 @@ ld2410:
 
 binary_sensor:
   - platform: ld2410
-    has_target:          {name: Presence,      id: mmwave_presence}
-    has_moving_target:   {name: Moving Target, id: mmwave_moving_target}
-    has_still_target:    {name: Still Target,  id: mmwave_still_target}
+    has_target: { name: Presence, id: mmwave_presence }
+    has_moving_target: { name: Moving Target, id: mmwave_moving_target }
+    has_still_target: { name: Still Target, id: mmwave_still_target }
 
 sensor:
   - platform: ld2410
-    moving_distance:    {name: Moving Distance,    id: mmwave_moving_distance}
-    still_distance:     {name: Still Distance,     id: mmwave_still_distance}
-    moving_energy:      {name: Move Energy,        id: mmwave_moving_energy}
-    still_energy:       {name: Still Energy,       id: mmwave_still_energy}
-    detection_distance: {name: Detection Distance, id: mmwave_detection_distance}
+    moving_distance: { name: Moving Distance, id: mmwave_moving_distance }
+    still_distance: { name: Still Distance, id: mmwave_still_distance }
+    moving_energy: { name: Move Energy, id: mmwave_moving_energy }
+    still_energy: { name: Still Energy, id: mmwave_still_energy }
+    detection_distance:
+      { name: Detection Distance, id: mmwave_detection_distance }
 ```
 
 Add optional `number:` (calibration from HA) and `button:` (factory reset, restart) platforms — the component supports them.
@@ -458,14 +460,14 @@ uart:
 
 Reading hex dumps is the forensics of embedded debugging. These patterns are load-bearing:
 
-| Pattern | Diagnosis | Example |
-|---------|-----------|---------|
-| `F4:F3:F2:F1 ... F8:F7:F6:F5` | Valid LD2410 data frame | Working! Parser bug if still warning |
-| `FD:FC:FB:FA ... 04:03:02:01` | Valid LD2410 command ACK | Working |
-| **`C0:E0:F0:FC:FE:FF` (progressive ones)** | **RC ramp — SHORT circuit or high capacitance on line** | Check GPIO3↔GPIO4 solder bridge |
-| `00:00:00:00:00:00 00:FF:00:00` (mostly zeros, sparse noise) | Line idle — sensor not transmitting | No power, cold TX joint, or dead sensor |
-| Continuous random bytes, no structure | Baud rate mismatch | Try alternate bauds (9600, 115200, 256000) |
-| All `0xFF` | Line pulled up, no driver | Sensor not powered OR TX floating |
+| Pattern                                                      | Diagnosis                                               | Example                                    |
+| ------------------------------------------------------------ | ------------------------------------------------------- | ------------------------------------------ |
+| `F4:F3:F2:F1 ... F8:F7:F6:F5`                                | Valid LD2410 data frame                                 | Working! Parser bug if still warning       |
+| `FD:FC:FB:FA ... 04:03:02:01`                                | Valid LD2410 command ACK                                | Working                                    |
+| **`C0:E0:F0:FC:FE:FF` (progressive ones)**                   | **RC ramp — SHORT circuit or high capacitance on line** | Check GPIO3↔GPIO4 solder bridge            |
+| `00:00:00:00:00:00 00:FF:00:00` (mostly zeros, sparse noise) | Line idle — sensor not transmitting                     | No power, cold TX joint, or dead sensor    |
+| Continuous random bytes, no structure                        | Baud rate mismatch                                      | Try alternate bauds (9600, 115200, 256000) |
+| All `0xFF`                                                   | Line pulled up, no driver                               | Sensor not powered OR TX floating          |
 
 The progressive-ones pattern is non-obvious but definitive: a digital line shouldn't take 11 bytes to transition from low to high. If it does, the edge is being slowed by RC behavior — either a short to an adjacent driven line, or high cable capacitance + weak drive.
 
@@ -565,6 +567,7 @@ If the board HAS a BOOT button: hold BOOT → press RESET → release BOOT → f
 ### Verification
 
 From the Mac:
+
 ```bash
 ping <device-name>.local    # Should resolve via mDNS
 ```
@@ -603,19 +606,19 @@ esphome version             # Version check
 
 ## Common Errors and Fixes
 
-| Error | Cause | Fix |
-|-------|-------|-----|
-| `Error reading file secrets.yaml: [Errno 2]` | User only has `secrets.yaml.example`, not `secrets.yaml` | `cp secrets.yaml.example secrets.yaml` and fill with real creds |
-| `Failed to connect to ESP32-C3: No serial data received` | Board not in bootloader mode | Force bootloader: GPIO9 → GND, replug USB |
-| Device not in HA "Discovered" | mDNS blocked, wrong subnet, or device not on WiFi | `ping <name>.local`, check `esphome logs` for WiFi connect |
-| LED is on when HA says "off" (and vice versa) | Missing `inverted: true` on C3/C3-SuperMini GPIO | Add `inverted: true` to the `output:` pin block |
-| Encryption key mismatch on adoption | Key in HA ≠ key in YAML | Copy key from YAML `api.encryption.key` exactly |
-| Compile works but upload hangs | Wrong USB port selected | `ls /dev/cu.*` — pick the right one |
-| Real WiFi password in `secrets.yaml.example` | User edited the wrong file | Revert `.example` to placeholders, rotate WiFi password if committed |
-| `Component online_image requires component http_request` | Missing sibling component | Add top-level `http_request:` block |
-| OLED 1.3" found on I²C scan but screen stays black | SH1106 clone with default contrast=0 | Add `contrast: 100%` to `display:` block |
-| OLED shows garbled/random pixels | Wrong driver model (likely SSD1306 configured for SH1106 chip) | Change `model:` to `"SH1106 128x64"` |
-| HA entity state never arrives (no `Got state` log line) | Wrong `entity_id` (entity doesn't exist in HA) | Check exact ID in HA → Developer Tools → States |
+| Error                                                    | Cause                                                          | Fix                                                                  |
+| -------------------------------------------------------- | -------------------------------------------------------------- | -------------------------------------------------------------------- |
+| `Error reading file secrets.yaml: [Errno 2]`             | User only has `secrets.yaml.example`, not `secrets.yaml`       | `cp secrets.yaml.example secrets.yaml` and fill with real creds      |
+| `Failed to connect to ESP32-C3: No serial data received` | Board not in bootloader mode                                   | Force bootloader: GPIO9 → GND, replug USB                            |
+| Device not in HA "Discovered"                            | mDNS blocked, wrong subnet, or device not on WiFi              | `ping <name>.local`, check `esphome logs` for WiFi connect           |
+| LED is on when HA says "off" (and vice versa)            | Missing `inverted: true` on C3/C3-SuperMini GPIO               | Add `inverted: true` to the `output:` pin block                      |
+| Encryption key mismatch on adoption                      | Key in HA ≠ key in YAML                                        | Copy key from YAML `api.encryption.key` exactly                      |
+| Compile works but upload hangs                           | Wrong USB port selected                                        | `ls /dev/cu.*` — pick the right one                                  |
+| Real WiFi password in `secrets.yaml.example`             | User edited the wrong file                                     | Revert `.example` to placeholders, rotate WiFi password if committed |
+| `Component online_image requires component http_request` | Missing sibling component                                      | Add top-level `http_request:` block                                  |
+| OLED 1.3" found on I²C scan but screen stays black       | SH1106 clone with default contrast=0                           | Add `contrast: 100%` to `display:` block                             |
+| OLED shows garbled/random pixels                         | Wrong driver model (likely SSD1306 configured for SH1106 chip) | Change `model:` to `"SH1106 128x64"`                                 |
+| HA entity state never arrives (no `Got state` log line)  | Wrong `entity_id` (entity doesn't exist in HA)                 | Check exact ID in HA → Developer Tools → States                      |
 
 ---
 
