@@ -1,0 +1,25 @@
+CONFIG_IDF_TARGET="esp32c6"
+CONFIG_ESPTOOLPY_FLASHSIZE_4MB=y
+
+# Native USB Serial/JTAG console (XIAO C6 has no UART bridge chip)
+CONFIG_ESP_CONSOLE_USB_SERIAL_JTAG=y
+CONFIG_ESP_CONSOLE_USB_SERIAL_JTAG_ENABLED=y
+
+# Logging
+CONFIG_LOG_DEFAULT_LEVEL_INFO=y
+
+# Custom partition table (needed for Zigbee zb_storage + zb_fct)
+CONFIG_PARTITION_TABLE_CUSTOM=y
+CONFIG_PARTITION_TABLE_CUSTOM_FILENAME="partitions.csv"
+CONFIG_PARTITION_TABLE_OFFSET=0x8000
+
+# Zigbee — End Device with native 802.15.4 radio
+CONFIG_ZB_ENABLED=y
+CONFIG_ZB_ZED=y
+CONFIG_ZB_RADIO_NATIVE=y
+
+# FreeRTOS tick rate Zigbee expects
+CONFIG_FREERTOS_HZ=1000
+
+# Disable BLE / WiFi to save space (this is a pure Zigbee device)
+CONFIG_BT_ENABLED=n
